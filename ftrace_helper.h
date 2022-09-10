@@ -13,6 +13,18 @@
 #define PTREGS_SYSCALL_STUBS 1
 #endif
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,11,0))
+#define FTRACE_OPS_FL_RECURSION_SAFE FTRACE_OPS_FL_RECURSION
+#endif
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
+#define KPROBE_LOOKUP 1
+#include <linux/kprobes.h>
+static struct kprobe kp = {
+    .symbol_name = "kallsyms_lookup_name"
+};
+#endif
+
 /* x64 has to be special and require a different naming convention */
 #ifdef PTREGS_SYSCALL_STUBS
 #define SYSCALL_NAME(name) ("__x64_" name)
@@ -60,6 +72,13 @@ struct ftrace_hook {
  * */
 static int fh_resolve_hook_address(struct ftrace_hook *hook)
 {
+    #ifdef KPROBE_LOOKUP
+    typedef unsigned long (*kallsyms_lookup_name_t)(const char *name);
+    kallsyms_lookup_name_t kallsyms_lookup_name;
+    register_kprobe(&kp);
+    kallsyms_lookup_name = (kallsyms_lookup_name_t) kp.addr;
+    unregister_kprobe(&kp);
+    #endif
     hook->address = kallsyms_lookup_name(hook->name);
 
     if (!hook->address)
@@ -77,16 +96,30 @@ static int fh_resolve_hook_address(struct ftrace_hook *hook)
     return 0;
 }
 
+
 /* See comment below within fh_install_hook() */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,11,0))
+static void notrace fh_ftrace_thunk(unsigned long ip, unsigned long parent_ip, struct ftrace_ops *ops, struct ftrace_regs *regs)
+#else
 static void notrace fh_ftrace_thunk(unsigned long ip, unsigned long parent_ip, struct ftrace_ops *ops, struct pt_regs *regs)
+#endif
 {
     struct ftrace_hook *hook = container_of(ops, struct ftrace_hook, ops);
 
 #if USE_FENTRY_OFFSET
+    #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,11,0))
+    regs->regs.ip = (unsigned long) hook->function;
+    #else
     regs->ip = (unsigned long) hook->function;
+    #endif
 #else
-    if(!within_module(parent_ip, THIS_MODULE))
+    if(!within_module(parent_ip, THIS_MODULE)) {
+        #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,11,0))
+        regs->regs.ip = (unsigned long) hook->function;
+        #else
         regs->ip = (unsigned long) hook->function;
+        #endif
+    }
 #endif
 }
 
@@ -110,7 +143,11 @@ int fh_install_hook(struct ftrace_hook *hook)
      * the built-in anti-recursion guard provided by ftrace is useless if
      * we're modifying $rip. This is why we have to implement our own checks
      * (see USE_FENTRY_OFFSET). */
+    #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,11,0))
     hook->ops.func = fh_ftrace_thunk;
+    #else
+    hook->ops.func = fh_ftrace_thunk->regs;
+    #endif
     hook->ops.flags = FTRACE_OPS_FL_SAVE_REGS
             | FTRACE_OPS_FL_RECURSION_SAFE
             | FTRACE_OPS_FL_IPMODIFY;
