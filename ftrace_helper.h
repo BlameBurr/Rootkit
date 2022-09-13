@@ -25,12 +25,20 @@ static struct kprobe kp = {
 #define FTRACE_REGS_REC 1
 #endif
 
+#ifdef PTREGS_SYSCALL_STUBS
+#define SYSCALL_NAME(name) ("__x64_" name)
+#else
+#define SYSCALL_NAME(name) (name)
+#endif
+
 //Main functions and definitions
 #define USE_FENTRY_OFFSET 0 //Prevent recursive loop by detection of return address (0) or by jumping over ftrace call (1)
-#define HOOK(name, hookFn, origFn) {                            \
-    .name = ((PTREGS_SYSCALL_STUBS == 1 ? "__x64_" : "") name), \
-    .function = (hookFn),                                       \
-    .original = (origFn)                                        \
+
+#define HOOK(_name, _hook, _orig)   \
+{                   \
+    .name = SYSCALL_NAME(_name),    \
+    .function = (_hook),            \
+    .original = (_orig),            \
 }
 
 #if !USE_FENTRY_OFFSET
@@ -77,7 +85,7 @@ static int fh_resolve_hook_address(struct ftrace_hook *hook) {
 
 static void notrace fh_ftrace_thunk(unsigned long ip, unsigned long parent_ip, struct ftrace_ops *ops, struct ftrace_regs *fregs) {
     struct pt_regs *regs = ftrace_get_regs(fregs);
-    struct ftrace_hook *hook = container_of(ops, struct, ftrace_hook, ops);
+    struct ftrace_hook *hook = container_of(ops, struct ftrace_hook, ops);
     #if !USE_FENTRY_OFFSET
     if (!within_module(parent_ip, THIS_MODULE))
         regs->ip = (unsigned long) hook->function;
@@ -137,5 +145,5 @@ int fh_install_hooks(struct ftrace_hook *hooks, size_t count) {
 void fh_remove_hooks(struct ftrace_hook *hooks, size_t count) {
     size_t i;
     for (i = 0; i < count; i++)
-        fh_remove_hook(&hooks(i));
+        fh_remove_hook(&hooks[i]);
 };
