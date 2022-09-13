@@ -25,17 +25,17 @@ static struct kprobe kp = {
 #define FTRACE_REGS_REC 1
 #endif
 
+//Main functions and definitions
+#define USE_FENTRY_OFFSET 0 //Prevent recursive loop by detection of return address (0) or by jumping over ftrace call (1)
+
 #ifdef PTREGS_SYSCALL_STUBS
 #define SYSCALL_NAME(name) ("__x64_" name)
 #else
 #define SYSCALL_NAME(name) (name)
 #endif
 
-//Main functions and definitions
-#define USE_FENTRY_OFFSET 0 //Prevent recursive loop by detection of return address (0) or by jumping over ftrace call (1)
-
 #define HOOK(_name, _hook, _orig)   \
-{                   \
+{                                   \
     .name = SYSCALL_NAME(_name),    \
     .function = (_hook),            \
     .original = (_orig),            \
