@@ -4,15 +4,11 @@
     * Rewritten by: James Walker
     * License: GPL
 */
-
 #include <linux/ftrace.h>
 #include <linux/linkage.h>
 #include <linux/slab.h>
 #include <linux/uaccess.h>
-
-#if defined(CONFIG_X86_64) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,17,0))
-#define PTREGS_SYSCALL_STUBS 1
-#endif
+#include "common.h"
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,11,0))
 #define FTRACE_REGS_REC 1
@@ -67,7 +63,6 @@ static int fh_resolve_hook_address(struct ftrace_hook *hook) {
     unregister_kprobe(&kp);
     #endif
     hook->address = kallsyms_lookup_name(hook->name);
-    printk(KERN_DEBUG "%s address is %p\n", hook->name, hook->address);
     if (!hook->address) {
         printk(KERN_DEBUG "fh_resolve_hook_address failed to resolve symbol: %s\n", hook->name);
         return -ENOENT;
