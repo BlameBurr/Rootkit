@@ -4,10 +4,6 @@
     * Rewritten by: James Walker
     * License: GPL
 */
-#include <linux/ftrace.h>
-#include <linux/linkage.h>
-#include <linux/slab.h>
-#include <linux/uaccess.h>
 #include "common.h"
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,11,0))
