@@ -15,6 +15,7 @@ struct ftrace_hook hooks[] = {
 
 static int __init load(void) {
     int err = fh_install_hooks(hooks, ARRAY_SIZE(hooks));
+    printk(KERN_INFO "%p", &killOG);
     if (err) {
         printk(KERN_DEBUG "fh_install_hooks failed; %d\n", err);
         return err;
