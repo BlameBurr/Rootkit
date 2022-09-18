@@ -1,2 +1,2 @@
 #include "functions/kill.h"
-#include "functions/protectKing.h"
+#include "functions/openAt.h"
