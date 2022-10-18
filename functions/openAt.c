@@ -2,9 +2,9 @@
 
 short closeProcess = 0;
 
+
 #ifdef PTREGS_SYSCALL_STUBS
 asmlinkage long (*ogOpenAt)(struct pt_regs *regs);
-asmlinkage long (*ogClose)(unsigned int fd);
 asmlinkage long hookOpenAt(struct pt_regs *regs) {
 	char *buf = kzalloc(4096, GFP_KERNEL);
 	long ret = 0;
@@ -16,14 +16,13 @@ asmlinkage long hookOpenAt(struct pt_regs *regs) {
 
 	kfree(buf);
 	
-	if ((ret == -1) && (closeProcess == 1)) ogClose(0);
+	if ((ret == -1) && (closeProcess == 1)) close_fd(0);
 	if (ret == 0) ret = ogOpenAt(regs);
 
 	return ret;
 }
 #else
 asmlinkage long (*ogOpenAt)(int dfd, const char __user *filename, int flags, umode_t mode);
-asmlinkage long (*ogClose)(unsigned int fd);
 asmlinkage long hookOpenAt(int dfd, const char __user *filename, int flags, umode_t mode){
 	char *buf = kzalloc(4096, GFP_KERNEL);
 	long ret = 0;
@@ -34,7 +33,7 @@ asmlinkage long hookOpenAt(int dfd, const char __user *filename, int flags, umod
 
 	kfree(buf);
 	
-	if ((ret == -1) && (closeProcess == 1)) ogClose(0);
+	if ((ret == -1) && (closeProcess == 1)) close_fd(0);
 	if (ret == 0) ret = ogOpenAt(dfd, filename, flags, mode);
 
 	return ret;
