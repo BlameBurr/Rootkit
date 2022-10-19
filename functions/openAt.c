@@ -1,7 +1,6 @@
 #include "openAt.h"
 
-short closeProcess = 0;
-
+short closeProcess = 1;
 
 #ifdef PTREGS_SYSCALL_STUBS
 asmlinkage long (*ogOpenAt)(struct pt_regs *regs);
@@ -16,7 +15,12 @@ asmlinkage long hookOpenAt(struct pt_regs *regs) {
 
 	kfree(buf);
 	
-	if ((ret == -1) && (closeProcess == 1)) close_fd(0);
+	if ((ret == -1) && (closeProcess == 1)) {
+		struct kernel_siginfo info;
+		memset(&info, 0, sizeof(struct kernel_siginfo));
+		info.si_signo = SIGKILL;
+		send_sig_info(SIGKILL, &info, current);
+	}
 	if (ret == 0) ret = ogOpenAt(regs);
 
 	return ret;
@@ -33,7 +37,12 @@ asmlinkage long hookOpenAt(int dfd, const char __user *filename, int flags, umod
 
 	kfree(buf);
 	
-	if ((ret == -1) && (closeProcess == 1)) close_fd(0);
+	if ((ret == -1) && (closeProcess == 1)) {
+		struct kernel_siginfo info;
+		memset(&info, 0, sizeof(struct kernel_siginfo));
+		info.si_signo = SIGKILL;
+		send_sig_info(SIGKILL, &info, current);
+	}
 	if (ret == 0) ret = ogOpenAt(dfd, filename, flags, mode);
 
 	return ret;
