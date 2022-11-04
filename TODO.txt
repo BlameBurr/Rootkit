@@ -2,6 +2,7 @@
 //Create backdoor bind shell
 //Chmod, Chattr, NoClobber and Mount Bind root folder
 //Hide rootkit (*)
+//Process Priv-Esc (* - have an idea of a better way to implement it maybe)
 //Hide process
 //Hide listening port
 //Hide bind shell
