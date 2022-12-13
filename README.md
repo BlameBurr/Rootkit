@@ -8,13 +8,13 @@ Then there was symlinks, soft symlinks were a nightmare to resolve as you had fi
 
 # TODO
 ~~Hide Rootkit~~ (Could improve by reducing the traces left)
-~~Process Privilege Escalation~~ (Could improve by adding a thing to set specific processes to root rather than current)
-~~Immutable King File~~
-Reduce system processing overhead on hooked functions where possible (Not sure if current overhead causes instability on live systems)
-Hide Processes
-Create & Hide Bind Shell & Hide Listening Port
-Create Backdoor User
-Client & Magic file, word or packet System
+..~~Process Privilege Escalation~~ (Could improve by adding a thing to set specific processes to root rather than current)
+..~~Immutable King File~~
+..Reduce system processing overhead on hooked functions where possible (Not sure if current overhead causes instability on live systems)
+..Hide Processes
+..Create & Hide Bind Shell & Hide Listening Port
+..Create Backdoor User
+..Client & Magic file, word or packet System
 
 
 # Usage
