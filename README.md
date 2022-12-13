@@ -3,8 +3,8 @@ The goal of this is to write a proof of concept rootkit that can be loaded into 
 The rootkit is aimed primarily at TryHackMe's KoTH gamemode and is designed to prevent writing to the king file used to claim King of The Hill and gain points. Standard preventions work to a degree but are easily reversed whereas a rootkit functions at kernel level to prevent writing and therefore is a lot harder to circumvent if at all possible.
 
 # Problems found along the way
-Absolute paths were a breeze and could be handled as is, on the other hand there was relative paths that needed handling. This was much harder and the code will need cleaning up and refactoring as it's a drop in function an apache2 module; however, with a bit of work that was fixed.
-Then there was symlinks, soft symlinks were a nightmare to resolve as you had find the file it was actually linked to and compare its path; however using the kern_path and d_path (if I remember correctly) this was resolved. Hard links took at lot more work but ultimately actually had an easier resolution of just comparing inodes.
+* Absolute paths were a breeze and could be handled as is, on the other hand there was relative paths that needed handling. This was much harder and the code will need cleaning up and refactoring as it's a drop in function an apache2 module; however, with a bit of work that was fixed.
+* Then there was symlinks, soft symlinks were a nightmare to resolve as you had find the file it was actually linked to and compare its path; however using the kern_path and d_path (if I remember correctly) this was resolved. Hard links took at lot more work but ultimately actually had an easier resolution of just comparing inodes.
 
 # TODO
 * ~~Hide Rootkit~~ (Could improve by reducing the traces left)
