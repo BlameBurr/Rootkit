@@ -8,6 +8,7 @@
 //Hide bind shell
 //Hook sys_openat (immutability) (**)
 //Reduce processing overhead on sys_openat where possible
+//Magic word & client system?
 
 (*) Semi-done
 (**) Completed
