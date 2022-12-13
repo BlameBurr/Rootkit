@@ -7,9 +7,9 @@ Absolute paths were a breeze and could be handled as is, on the other hand there
 Then there was symlinks, soft symlinks were a nightmare to resolve as you had find the file it was actually linked to and compare its path; however using the kern_path and d_path (if I remember correctly) this was resolved. Hard links took at lot more work but ultimately actually had an easier resolution of just comparing inodes.
 
 # TODO
-~~ Hide Rootkit ~~ (Could improve by reducing the traces left)
-~~ Process Privilege Escalation ~~ (Could improve by adding a thing to set specific processes to root rather than current)
-~~ Immutable King File ~~
+~~Hide Rootkit~~ (Could improve by reducing the traces left)
+~~Process Privilege Escalation~~ (Could improve by adding a thing to set specific processes to root rather than current)
+~~Immutable King File~~
 Reduce system processing overhead on hooked functions where possible (Not sure if current overhead causes instability on live systems)
 Hide Processes
 Create & Hide Bind Shell & Hide Listening Port
