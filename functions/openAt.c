@@ -114,21 +114,21 @@ asmlinkage long hookOpenAt(int dfd, const char __user *filename, int flags, umod
 #endif
 	char *buffer = kzalloc(4096, GFP_KERNEL);
 	char *directory = kzalloc(4096, GFP_KERNEL);
-    struct path hLink, kFile;
-    int err, err2;
-    long ret = 0;
+	struct path hLink, kFile;
+	int err, err2;
+	long ret = 0;
 	if (!buffer) return ret;
 
 	if (strncpy_from_user(buffer, filename, 4096) > 0 && dfd == -100 && ((flags & O_WRONLY) == O_WRONLY || (flags & O_RDWR) == O_RDWR || (flags & O_APPEND) == O_APPEND)) {
-        directory = (strchr(buffer, (int)'/') - buffer == 0) ? strcpy(directory, buffer) : getpath(current, buffer);
+		directory = (strchr(buffer, (int)'/') - buffer == 0) ? strcpy(directory, buffer) : getpath(current, buffer);
 		respath(directory);
 		if (strcmp(directory, "/root/king.txt") == 0) ret = -1;
 		else {
-            err = kern_path(directory, LOOKUP_FOLLOW, &hLink);
-            err2 = kern_path("/root/king.txt", LOOKUP_FOLLOW, &kFile);
-            if (!err && !err2)
-                if (hLink.dentry->d_inode->i_ino == kFile.dentry->d_inode->i_ino) ret = -1;
-        }
+			err = kern_path(directory, LOOKUP_FOLLOW, &hLink);
+			err2 = kern_path("/root/king.txt", LOOKUP_FOLLOW, &kFile);
+			if (!err && !err2)
+			if (hLink.dentry->d_inode->i_ino == kFile.dentry->d_inode->i_ino) ret = -1;
+		}
 	} 
 	
 	kfree(buffer);
